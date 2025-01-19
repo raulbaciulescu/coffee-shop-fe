@@ -2,9 +2,11 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { products } from '../data/products';
+import { useCart } from '../contexts/CartContext';
 
 export function ProductDetails() {
   const { id } = useParams<{ id: string }>();
+  const { dispatch } = useCart();
   const product = products.find(p => p.id === id);
 
   if (!product) {
@@ -19,6 +21,10 @@ export function ProductDetails() {
       </div>
     );
   }
+
+  const addToCart = () => {
+    dispatch({ type: 'ADD_ITEM', payload: product });
+  };
 
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
@@ -89,7 +95,10 @@ export function ProductDetails() {
                 </div>
               </div>
 
-              <button className="w-full bg-[#6F4E37] text-white py-3 px-6 rounded-lg hover:bg-[#5D3D2B] transition-colors">
+              <button 
+                onClick={addToCart}
+                className="w-full bg-[#6F4E37] text-white py-3 px-6 rounded-lg hover:bg-[#5D3D2B] transition-colors"
+              >
                 Add to Cart
               </button>
             </div>
