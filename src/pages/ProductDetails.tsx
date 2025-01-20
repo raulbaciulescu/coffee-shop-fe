@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import {Product, products} from '../data/products';
+import {Product} from '../data/products';
 import { useCart } from '../contexts/CartContext';
 import {productService} from "../../services/api.ts";
 
@@ -17,7 +17,6 @@ export function ProductDetails() {
   const fetchProduct = async () => {
     const response = await productService.getById(id!);
     let data: Product;
-    console.log(response)
     data = {
       id:  response.id,
       name:  response.name,
@@ -33,8 +32,6 @@ export function ProductDetails() {
       image:  response.imageUrl ,
       price: `$${ response.price}`
     }
-
-    console.log('d ', data)
     setProduct(data);
   };
 
