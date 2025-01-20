@@ -55,5 +55,20 @@ export const products: Product[] = [
     origin: "Huila, Colombia",
     roastLevel: "Dark",
     flavorNotes: ["Dark chocolate", "Walnut", "Brown sugar"]
+  },
+  {
+    id: "colombian-dark2",
+    name: "Colombian Dark2",
+    price: "$4.757",
+    image: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?auto=format&fit=crop&q=80",
+    galleryImages: [
+      "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80"
+    ],
+    description: "A rich, full-bodied dark roast made from premium Colombian beans, featuring deep chocolate notes and a smooth, clean finish.",
+    origin: "Huila, Colombia",
+    roastLevel: "Dark",
+    flavorNotes: ["Dark chocolate", "Walnut", "Brown sugar"]
   }
 ];

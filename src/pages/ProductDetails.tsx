@@ -1,13 +1,42 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { products } from '../data/products';
+import {Product, products} from '../data/products';
 import { useCart } from '../contexts/CartContext';
+import {productService} from "../../services/api.ts";
 
 export function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const { dispatch } = useCart();
-  const product = products.find(p => p.id === id);
+  const [product, setProduct] = useState();
+
+  useEffect(() => {
+    fetchProduct();
+  }, []);
+
+  const fetchProduct = async () => {
+    const response = await productService.getById(id!);
+    let data: Product;
+    console.log(response)
+    data = {
+      id:  response.id,
+      name:  response.name,
+      description:  response.description,
+      galleryImages: [
+        "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1442550528053-c431ecb55509?auto=format&fit=crop&q=80"
+      ],
+      origin:  response.origin,
+      roastLevel: "Medium",
+      flavorNotes: ["Chocolate", "Caramel", "Light citrus"],
+      image:  response.imageUrl ,
+      price: `$${ response.price}`
+    }
+
+    console.log('d ', data)
+    setProduct(data);
+  };
 
   if (!product) {
     return (
