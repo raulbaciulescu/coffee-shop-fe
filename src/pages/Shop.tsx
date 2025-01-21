@@ -4,51 +4,19 @@ import { Search, SlidersHorizontal, Coffee, ChevronDown, ShoppingCart } from 'lu
 import { useCart } from '../contexts/CartContext';
 import {Product} from "../data/products.ts";
 import {productService} from "../../services/api.ts";
+import {useProducts} from "../../hooks/hooks.ts";
 
 type RoastLevel = 'Light' | 'Medium' | 'Dark';
 type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
 
 export function Shop() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoastLevels, setSelectedRoastLevels] = useState<RoastLevel[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('name-asc');
   const { dispatch } = useCart();
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await productService.getAll();
-      let data: Product[];
-      data = await response.map(product => ({
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        galleryImages: [
-          "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80",
-          "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80",
-          "https://images.unsplash.com/photo-1442550528053-c431ecb55509?auto=format&fit=crop&q=80"
-        ],
-        origin: product.origin,
-        roastLevel: "Medium",
-        flavorNotes: ["Chocolate", "Caramel", "Light citrus"],
-        image: product.imageUrl ,
-        price: `$${product.price}`,
-      }));
-      setProducts(data);
-    } catch (err) {
-      setError('Failed to load products');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { products, loading, error, fetchProducts } = useProducts();
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = products.filter(product => {
