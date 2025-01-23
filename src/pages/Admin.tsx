@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { Plus, Loader, Save, Trash2 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Plus, Loader, Save, Trash2, Image as ImageIcon, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {Product} from "../data/products.ts";
-import {productService} from "../../services/api.ts";
+import {useProducts} from "../../hooks/hooks.ts";
 
 interface ProductFormData {
     name: string;
     price: string;
-    image: string;
+    image: File | null;
+    galleryImages: File[];
     description: string;
     origin: string;
     roastLevel: string;
@@ -17,7 +18,8 @@ interface ProductFormData {
 const initialFormData: ProductFormData = {
     name: '',
     price: '',
-    image: '',
+    image: null,
+    galleryImages: [],
     description: '',
     origin: '',
     roastLevel: 'Medium',
@@ -28,64 +30,115 @@ export function Admin() {
     const [formData, setFormData] = useState<ProductFormData>(initialFormData);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [products, setProducts] = useState<Product[]>([]);
+    const [editingProduct, setEditingProduct] = useState<string | null>(null);
+    const [imagePreviews, setImagePreviews] = useState<{
+        main: string | null;
+        gallery: string[];
+    }>({
+        main: null,
+        gallery: [],
+    });
+    const mainImageInputRef = useRef<HTMLInputElement>(null);
+    const galleryImageInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
+    const { products, loading, error: productsError, createProduct, updateProduct, deleteProduct } = useProducts();
 
-    React.useEffect(() => {
-        fetchProducts();
-    }, []);
-
-    const fetchProducts = async () => {
-        try {
-            const response = await productService.getAll();
-            let data: Product[];
-            data = await response.map(product => ({
-                id: product.id,
-                name: product.name,
-                description: product.description,
-                galleryImages: [
-                    "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80",
-                    "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80",
-                    "https://images.unsplash.com/photo-1442550528053-c431ecb55509?auto=format&fit=crop&q=80"
-                ],
-                origin: product.origin,
-                roastLevel: "Medium",
-                flavorNotes: ["Chocolate", "Caramel", "Light citrus"],
-                image: product.imageUrl ,
-                price: `$${product.price}`,
-            }));
-            setProducts(data);
-        } catch (err) {
-            setError('Failed to load products');
-        } finally {
-            //setLoading(false);
+    const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setFormData(prev => ({ ...prev, image: file }));
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreviews(prev => ({ ...prev, main: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
         }
+    };
+
+    const handleGalleryImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        setFormData(prev => ({
+            ...prev,
+            galleryImages: [...prev.galleryImages, ...files],
+        }));
+
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreviews(prev => ({
+                    ...prev,
+                    gallery: [...prev.gallery, reader.result as string],
+                }));
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const removeGalleryImage = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            galleryImages: prev.galleryImages.filter((_, i) => i !== index),
+        }));
+        setImagePreviews(prev => ({
+            ...prev,
+            gallery: prev.gallery.filter((_, i) => i !== index),
+        }));
+    };
+
+    const handleEdit = (product: Product) => {
+        setEditingProduct(product.id);
+        setFormData({
+            name: product.name,
+            price: product.price,
+            image: null, // Can't set File object from URL
+            galleryImages: [],
+            description: product.description,
+            origin: product.origin,
+            roastLevel: product.roastLevel,
+            flavorNotes: product.flavorNotes,
+        });
+        setImagePreviews({
+            main: product.image,
+            gallery: product.galleryImages,
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!formData.image && !editingProduct) {
+            setError('Main image is required');
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
 
-        console.log(formData);
         try {
-            const response = await fetch('http://localhost:8080/products', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    ...formData,
-                    price: formData.price.startsWith('$') ? formData.price : `$${formData.price}`,
-                }),
+            const formDataToSend = new FormData();
+            formDataToSend.append('name', formData.name);
+            formDataToSend.append('price', formData.price.replace('$', ''));
+            if (formData.image) {
+                formDataToSend.append('image', formData.image);
+            }
+            formData.galleryImages.forEach(file => {
+                formDataToSend.append('galleryImages', file);
             });
+            formDataToSend.append('description', formData.description);
+            formDataToSend.append('origin', formData.origin);
+            formDataToSend.append('roastLevel', formData.roastLevel);
+            formDataToSend.append('flavorNotes', JSON.stringify(formData.flavorNotes));
 
-            if (!response.ok) throw new Error('Failed to create product');
+            if (editingProduct) {
+                await updateProduct(editingProduct, formDataToSend);
+                setEditingProduct(null);
+            } else {
+                await createProduct(formDataToSend);
+            }
 
             setFormData(initialFormData);
-            fetchProducts();
+            setImagePreviews({ main: null, gallery: [] });
         } catch (err) {
-            setError('Failed to create product');
+            setError(editingProduct ? 'Failed to update product' : 'Failed to create product');
         } finally {
             setIsLoading(false);
         }
@@ -93,12 +146,7 @@ export function Admin() {
 
     const handleDelete = async (id: string) => {
         try {
-            const response = await fetch(`http://localhost:8080/products/${id}`, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) throw new Error('Failed to delete product');
-            fetchProducts();
+            await deleteProduct(id);
         } catch (err) {
             setError('Failed to delete product');
         }
@@ -174,15 +222,90 @@ export function Admin() {
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Image URL
+                                    Main Image
                                 </label>
-                                <input
-                                    type="url"
-                                    value={formData.image}
-                                    onChange={e => setFormData(prev => ({ ...prev, image: e.target.value }))}
-                                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#6F4E37] focus:border-transparent"
-                                    required
-                                />
+                                <div className="space-y-2">
+                                    <input
+                                        type="file"
+                                        ref={mainImageInputRef}
+                                        onChange={handleMainImageChange}
+                                        accept="image/*"
+                                        className="hidden"
+                                    />
+                                    <div className="flex gap-4 items-center">
+                                        <button
+                                            type="button"
+                                            onClick={() => mainImageInputRef.current?.click()}
+                                            className="flex items-center gap-2 px-4 py-2 border border-[#6F4E37] text-[#6F4E37] rounded-lg hover:bg-[#6F4E37] hover:text-white transition-colors"
+                                        >
+                                            <Upload className="w-4 h-4" />
+                                            {formData.image ? 'Change Image' : 'Upload Image'}
+                                        </button>
+                                        {imagePreviews.main && (
+                                            <div className="relative w-20 h-20">
+                                                <img
+                                                    src={imagePreviews.main}
+                                                    alt="Preview"
+                                                    className="w-full h-full object-cover rounded-lg"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setFormData(prev => ({ ...prev, image: null }));
+                                                        setImagePreviews(prev => ({ ...prev, main: null }));
+                                                    }}
+                                                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Gallery Images
+                                </label>
+                                <div className="space-y-4">
+                                    <input
+                                        type="file"
+                                        ref={galleryImageInputRef}
+                                        onChange={handleGalleryImageChange}
+                                        accept="image/*"
+                                        multiple
+                                        className="hidden"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => galleryImageInputRef.current?.click()}
+                                        className="flex items-center gap-2 px-4 py-2 border border-[#6F4E37] text-[#6F4E37] rounded-lg hover:bg-[#6F4E37] hover:text-white transition-colors"
+                                    >
+                                        <ImageIcon className="w-4 h-4" />
+                                        Add Gallery Images
+                                    </button>
+                                    {imagePreviews.gallery.length > 0 && (
+                                        <div className="grid grid-cols-4 gap-2">
+                                            {imagePreviews.gallery.map((preview, index) => (
+                                                <div key={index} className="relative">
+                                                    <img
+                                                        src={preview}
+                                                        alt={`Gallery ${index + 1}`}
+                                                        className="w-full h-24 object-cover rounded-lg"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeGalleryImage(index)}
+                                                        className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             <div>
@@ -272,7 +395,7 @@ export function Admin() {
                                 ) : (
                                     <>
                                         <Save className="w-5 h-5" />
-                                        Save Product
+                                        {editingProduct ? 'Update Product' : 'Save Product'}
                                     </>
                                 )}
                             </button>
@@ -282,30 +405,66 @@ export function Admin() {
                     {/* Products List */}
                     <div className="bg-white rounded-xl p-6 shadow-md">
                         <h2 className="text-xl font-bold mb-6 text-[#2C1810]">Current Products</h2>
-                        <div className="space-y-4">
-                            {products.map(product => (
-                                <div
-                                    key={product.id}
-                                    className="flex items-center gap-4 p-4 border border-gray-100 rounded-lg hover:bg-gray-50"
-                                >
-                                    <img
-                                        src={product.image}
-                                        alt={product.name}
-                                        className="w-16 h-16 object-cover rounded-lg"
-                                    />
-                                    <div className="flex-1">
-                                        <h3 className="font-semibold text-[#2C1810]">{product.name}</h3>
-                                        <p className="text-[#6F4E37]">{product.price}</p>
+                        {loading ? (
+                            <div className="flex items-center justify-center py-8">
+                                <Loader className="w-8 h-8 animate-spin text-[#6F4E37]" />
+                            </div>
+                        ) : productsError ? (
+                            <div className="text-red-500 text-center py-8">{productsError}</div>
+                        ) : (
+                            <div className="space-y-4">
+                                {products.map(product => (
+                                    <div key={product.id} className="flex gap-4 p-4 border border-gray-100 rounded-lg hover:bg-gray-50">
+                                        <div className="flex-shrink-0">
+                                            <img
+                                                src={product.image}
+                                                alt={product.name}
+                                                className="w-16 h-16 object-cover rounded-lg"
+                                            />
+                                            <div className="mt-2 flex gap-1">
+                                                {product.galleryImages.slice(0, 3).map((image, index) => (
+                                                    <div key={index} className="w-4 h-4 rounded overflow-hidden">
+                                                        <img
+                                                            src={image}
+                                                            alt={`Gallery ${index + 1}`}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="font-semibold text-[#2C1810]">{product.name}</h3>
+                                            <p className="text-[#6F4E37]">{product.price}</p>
+                                            <div className="mt-1 flex flex-wrap gap-1">
+                                                {product.flavorNotes.map((note, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="px-2 py-0.5 bg-[#f8f3e9] rounded-full text-xs text-[#6F4E37]"
+                                                    >
+                                                        {note}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => handleEdit(product)}
+                                                className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(product.id)}
+                                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                                            >
+                                                <Trash2 className="w-5 h-5" />
+                                            </button>
+                                        </div>
                                     </div>
-                                    <button
-                                        onClick={() => handleDelete(product.id)}
-                                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

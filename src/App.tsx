@@ -8,6 +8,7 @@ import { Checkout } from './pages/Checkout';
 import { Admin } from './pages/Admin';
 import { Navbar } from './components/Navbar';
 import { CartProvider } from './contexts/CartContext';
+import {Contact} from "./pages/Contact.tsx";
 
 function App() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -35,6 +36,7 @@ function App() {
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/contact" element={<Contact />} />
             </Routes>
           </div>
         </BrowserRouter>
