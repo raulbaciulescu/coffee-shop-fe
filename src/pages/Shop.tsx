@@ -18,36 +18,6 @@ export function Shop() {
   const { dispatch } = useCart();
   const { products, loading, error, fetchProducts } = useProducts();
 
-  const filteredAndSortedProducts = useMemo(() => {
-    let filtered = products.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesRoastLevel = selectedRoastLevels.length === 0 ||
-          selectedRoastLevels.includes(product.roastLevel as RoastLevel);
-
-      const productPrice = parseFloat(product.price.replace('$', ''));
-      const matchesPrice = productPrice >= priceRange[0] && productPrice <= priceRange[1];
-
-      return matchesSearch && matchesRoastLevel && matchesPrice;
-    });
-
-    return filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name-asc':
-          return a.name.localeCompare(b.name);
-        case 'name-desc':
-          return b.name.localeCompare(a.name);
-        case 'price-asc':
-          return parseFloat(a.price.replace('$', '')) - parseFloat(b.price.replace('$', ''));
-        case 'price-desc':
-          return parseFloat(b.price.replace('$', '')) - parseFloat(a.price.replace('$', ''));
-        default:
-          return 0;
-      }
-    });
-  }, [searchQuery, selectedRoastLevels, priceRange, sortBy, products]);
-
   const toggleRoastLevel = (level: RoastLevel) => {
     setSelectedRoastLevels(prev =>
         prev.includes(level)
@@ -59,6 +29,22 @@ export function Shop() {
   const addToCart = (product: Product) => {
     dispatch({ type: 'ADD_ITEM', payload: product });
   };
+
+  // Sort products
+  const sortedProducts = [...products].sort((a, b) => {
+    switch (sortBy) {
+      case 'name-asc':
+        return a.name.localeCompare(b.name);
+      case 'name-desc':
+        return b.name.localeCompare(a.name);
+      case 'price-asc':
+        return a.price - b.price;
+      case 'price-desc':
+        return b.price - a.price;
+      default:
+        return 0;
+    }
+  });
 
   if (loading) {
     return (
@@ -210,7 +196,7 @@ export function Shop() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredAndSortedProducts.map((product) => (
+                {sortedProducts.map((product) => (
                     <div key={product.id} className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
                       <Link to={`/product/${product.id}`} className="block">
                         <div className="aspect-square">
