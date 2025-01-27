@@ -8,6 +8,14 @@ const api = axios.create({
     },
 });
 
+const apiImage = axios.create({
+    baseURL: 'http://localhost:8080',
+    headers: {
+        'Content-Type': 'multipart/form-data;',
+    },
+});
+
+
 export const productService = {
     getAll: async () => {
         const { data } = await api.get('/products');
@@ -19,8 +27,13 @@ export const productService = {
         return data;
     },
 
-    create: async (product: Omit<Product, 'id'>) => {
-        const { data } = await api.post('/products', {
+    create: async (product: FormData) => {
+        const { data } = await apiImage.post('/products', product);
+        return data;
+    },
+
+    update: async (product: Product) => {
+        const { data } = await api.put('/products', {
             ...product,
             price: product.price.startsWith('$') ? product.price : `$${product.price}`,
         });

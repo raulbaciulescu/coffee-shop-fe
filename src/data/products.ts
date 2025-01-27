@@ -2,7 +2,7 @@ export interface Product {
   id: string;
   name: string;
   price: string;
-  image: string;
+  mainImage: string;
   galleryImages: string[];
   description: string;
   origin: string;
@@ -15,13 +15,14 @@ export const products: Product[] = [
     id: "house-blend",
     name: "House Blend",
     price: "$4.50",
-    image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80",
+    mainImage: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80",
     galleryImages: [
       "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1442550528053-c431ecb55509?auto=format&fit=crop&q=80"
     ],
-    description: "Our signature house blend combines carefully selected beans from Central and South America, creating a perfectly balanced cup with medium body and subtle complexity.",
+    description: "Our signature house blend combines carefully selected beans from Central and South America, " +
+        "creating a perfectly balanced cup with medium body and subtle complexity.",
     origin: "Multi-region blend",
     roastLevel: "Medium",
     flavorNotes: ["Chocolate", "Caramel", "Light citrus"]
@@ -30,7 +31,7 @@ export const products: Product[] = [
     id: "ethiopian-light",
     name: "Ethiopian Light Roast",
     price: "$5.00",
-    image: "https://images.unsplash.com/photo-1442550528053-c431ecb55509?auto=format&fit=crop&q=80",
+    mainImage: "https://images.unsplash.com/photo-1442550528053-c431ecb55509?auto=format&fit=crop&q=80",
     galleryImages: [
       "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80",
@@ -45,7 +46,7 @@ export const products: Product[] = [
     id: "colombian-dark",
     name: "Colombian Dark",
     price: "$4.75",
-    image: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?auto=format&fit=crop&q=80",
+    mainImage: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?auto=format&fit=crop&q=80",
     galleryImages: [
       "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80",
@@ -60,7 +61,7 @@ export const products: Product[] = [
     id: "colombian-dark2",
     name: "Colombian Dark2",
     price: "$4.757",
-    image: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?auto=format&fit=crop&q=80",
+    mainImage: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?auto=format&fit=crop&q=80",
     galleryImages: [
       "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80",

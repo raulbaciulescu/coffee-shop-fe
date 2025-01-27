@@ -55,7 +55,7 @@ export function Home() {
                 className="bg-[#f8f3e9] rounded-lg overflow-hidden shadow-md transition-transform hover:scale-105"
               >
                 <img 
-                  src={product.image} 
+                  src={product.mainImage}
                   alt={product.name}
                   className="w-full h-48 object-cover"
                 />

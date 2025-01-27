@@ -45,7 +45,7 @@ export function CartModal({ isVisible, onClose }: CartModalProps) {
                                     className="flex gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors"
                                 >
                                     <img
-                                        src={item.image}
+                                        src={item.mainImage}
                                         alt={item.name}
                                         className="w-14 h-14 object-cover rounded-md"
                                     />

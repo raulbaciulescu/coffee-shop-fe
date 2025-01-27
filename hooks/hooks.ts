@@ -1,5 +1,5 @@
-import {useState, useCallback, useEffect} from 'react';
-import { productService } from '../services/api';
+import {useCallback, useEffect, useState} from 'react';
+import {productService} from '../services/api';
 import {Product} from "../src/data/products.ts";
 
 export function useProducts() {
@@ -20,17 +20,14 @@ export function useProducts() {
                 id: product.id,
                 name: product.name,
                 description: product.description,
-                galleryImages: [
-                    "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80",
-                    "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80",
-                    "https://images.unsplash.com/photo-1442550528053-c431ecb55509?auto=format&fit=crop&q=80"
-                ],
+                galleryImages: product.galleryImages.map(image => 'data:image/jpeg;base64,' + image),
                 origin: product.origin,
                 roastLevel: "Medium",
                 flavorNotes: ["Chocolate", "Caramel", "Light citrus"],
-                image: product.imageUrl ,
-                price: `$${product.price}`,
+                mainImage: 'data:image/jpeg;base64,' + product.mainImage,
+                price: product.price,
             }));
+            console.log(data)
             setProducts(data);
             setError(null);
         } catch (err) {
@@ -40,21 +37,22 @@ export function useProducts() {
         }
     };
 
-
-    const createProduct = useCallback(async (product: Omit<Product, 'id'>) => {
+    const createProduct = useCallback(async (productFormData: FormData) => {
         try {
             setError(null);
-            console.log(product)
-            const productDto = {
-                name: product.name,
-                description: product.description,
-                origin: product.origin,
-                roastLevel: "Medium",
-                imageUrl: product.image,
-                price: 3
-            }
-            await productService.create(productDto);
-            await fetchProducts(); // Refresh the list
+            console.log(productFormData)
+            // const productDto: Omit<Product, 'id'> = {
+            //     flavorNotes: [], galleryImages: [],
+            //     name: productFormData.name,
+            //     description: productFormData.description,
+            //     origin: productFormData.origin,
+            //     roastLevel: "Medium",
+            //     mainImage: productFormData.mainImage,
+            //     // galleryImages: product.galleryImages,
+            //     price: productFormData.price
+            // }
+            await productService.create(productFormData);
+            await fetchProducts()
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to create product');
             throw err;
@@ -72,6 +70,25 @@ export function useProducts() {
         }
     }, [fetchProducts]);
 
+    const updateProduct = useCallback(async (id: number, product: FormData) => {
+        // try {
+        //     setError(null);
+        //     const productDto = {
+        //         name: product.name,
+        //         description: product.description,
+        //         origin: product.origin,
+        //         roastLevel: "Medium",
+        //         imageUrl: product.image,
+        //         price: 3
+        //     }
+        //     await productService.update(productDto);
+        //     await fetchProducts(); // Refresh the list
+        // } catch (err) {
+        //     setError(err instanceof Error ? err.message : 'Failed to create product');
+        //     throw err;
+        // }
+    }, [fetchProducts]);
+
     return {
         products,
         loading,
@@ -79,5 +96,6 @@ export function useProducts() {
         fetchProducts,
         createProduct,
         deleteProduct,
+        updateProduct
     };
 }

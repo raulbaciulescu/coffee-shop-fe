@@ -59,7 +59,7 @@ export function Cart() {
                   >
                     <div className="flex gap-6">
                       <img
-                          src={item.image}
+                          src={item.mainImage}
                           alt={item.name}
                           className="w-32 h-32 object-cover rounded-lg"
                       />

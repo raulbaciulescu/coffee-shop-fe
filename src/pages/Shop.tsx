@@ -201,14 +201,14 @@ export function Shop() {
                       <Link to={`/product/${product.id}`} className="block">
                         <div className="aspect-square">
                           <img
-                              src={product.image}
+                              src={product.mainImage}
                               alt={product.name}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
                         <div className="p-4">
                           <h3 className="text-lg font-semibold mb-2 text-[#2C1810]">{product.name}</h3>
-                          <p className="text-[#6F4E37] font-bold">{product.price}</p>
+                          <p className="text-[#6F4E37] font-bold">{product.price} Lei</p>
                           <div className="mt-2 flex flex-wrap gap-2">
                             {product.flavorNotes.slice(0, 2).map((note, index) => (
                                 <span

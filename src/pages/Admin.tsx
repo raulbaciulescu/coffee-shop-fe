@@ -98,7 +98,7 @@ export function Admin() {
             flavorNotes: product.flavorNotes,
         });
         setImagePreviews({
-            main: product.image,
+            main: product.mainImage,
             gallery: product.galleryImages,
         });
     };
@@ -118,7 +118,7 @@ export function Admin() {
             formDataToSend.append('name', formData.name);
             formDataToSend.append('price', formData.price.replace('$', ''));
             if (formData.image) {
-                formDataToSend.append('image', formData.image);
+                formDataToSend.append('mainImage', formData.image);
             }
             formData.galleryImages.forEach(file => {
                 formDataToSend.append('galleryImages', file);
@@ -126,10 +126,11 @@ export function Admin() {
             formDataToSend.append('description', formData.description);
             formDataToSend.append('origin', formData.origin);
             formDataToSend.append('roastLevel', formData.roastLevel);
-            formDataToSend.append('flavorNotes', JSON.stringify(formData.flavorNotes));
+           // formDataToSend.append('flavorNotes', JSON.stringify(formData.flavorNotes));
 
             if (editingProduct) {
-                await updateProduct(editingProduct, formDataToSend);
+                const id: number = +editingProduct;
+                await updateProduct(id, formDataToSend);
                 setEditingProduct(null);
             } else {
                 await createProduct(formDataToSend);
@@ -417,7 +418,7 @@ export function Admin() {
                                     <div key={product.id} className="flex gap-4 p-4 border border-gray-100 rounded-lg hover:bg-gray-50">
                                         <div className="flex-shrink-0">
                                             <img
-                                                src={product.image}
+                                                src={product.mainImage}
                                                 alt={product.name}
                                                 className="w-16 h-16 object-cover rounded-lg"
                                             />

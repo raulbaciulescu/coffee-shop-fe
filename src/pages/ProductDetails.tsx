@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { products } from '../data/products';
-import { useCart } from '../contexts/CartContext';
+import React, {useState} from 'react';
+import {Link, useParams} from 'react-router-dom';
+import {ArrowLeft, Coffee} from 'lucide-react';
+import {useCart} from '../contexts/CartContext';
 import {useProducts} from "../../hooks/hooks.ts";
 import {ImageGallery} from "../components/ImageGalelery.tsx";
 
 export function ProductDetails() {
-
     const {id} = useParams<{ id: string }>();
     const {products, loading, error} = useProducts();
     const product = products.find(p => p.id == id);
@@ -28,10 +26,10 @@ export function ProductDetails() {
         );
     }
 
-    const allImages = [product.image, ...product.galleryImages];
+    const allImages = [product.mainImage, ...product.galleryImages];
 
     const addToCart = () => {
-        dispatch({ type: 'ADD_ITEM', payload: product });
+        dispatch({type: 'ADD_ITEM', payload: product});
     };
 
     const openGallery = (index: number) => {
@@ -44,7 +42,7 @@ export function ProductDetails() {
             <div className="min-h-screen pt-24 pb-16 px-4">
                 <div className="max-w-6xl mx-auto">
                     <Link to="/" className="inline-flex items-center text-[#6F4E37] hover:underline mb-8">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        <ArrowLeft className="w-4 h-4 mr-2"/>
                         Back to Home
                     </Link>
 
@@ -55,11 +53,12 @@ export function ProductDetails() {
                                 onClick={() => openGallery(0)}
                             >
                                 <img
-                                    src={product.image}
+                                    src={product.mainImage}
                                     alt={product.name}
                                     className="w-full h-[400px] object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
                                 />
-                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <div
+                                    className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <span className="text-white text-sm font-medium bg-black/50 px-4 py-2 rounded-full">
                     View Gallery
                   </span>
@@ -78,7 +77,8 @@ export function ProductDetails() {
                                                 alt={`${product.name} view ${index + 1}`}
                                                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                                             />
-                                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <div
+                                                className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"/>
                                         </div>
                                     </div>
                                 ))}
