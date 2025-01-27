@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import {ArrowLeft, Coffee} from 'lucide-react';
 import {useCart} from '../contexts/CartContext';
@@ -7,13 +7,27 @@ import {ImageGallery} from "../components/ImageGalelery.tsx";
 
 export function ProductDetails() {
     const {id} = useParams<{ id: string }>();
-    const {products, loading, error} = useProducts();
-    const product = products.find(p => p.id == id);
+    const {currentProduct, loading, error, getProductById} = useProducts();
     const {dispatch} = useCart();
     const [isGalleryOpen, setIsGalleryOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-    if (!product) {
+    useEffect(() => {
+        getProductById(id!);
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen pt-24 flex items-center justify-center">
+                <div className="text-center">
+                    <Coffee className="w-12 h-12 animate-spin mx-auto mb-4 text-[#6F4E37]" />
+                    <p className="text-[#2C1810]">Loading products...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!currentProduct) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -26,10 +40,10 @@ export function ProductDetails() {
         );
     }
 
-    const allImages = [product.mainImage, ...product.galleryImages];
+    const allImages = [currentProduct.mainImage, ...currentProduct.galleryImages];
 
     const addToCart = () => {
-        dispatch({type: 'ADD_ITEM', payload: product});
+        dispatch({type: 'ADD_ITEM', payload: currentProduct});
     };
 
     const openGallery = (index: number) => {
@@ -53,8 +67,8 @@ export function ProductDetails() {
                                 onClick={() => openGallery(0)}
                             >
                                 <img
-                                    src={product.mainImage}
-                                    alt={product.name}
+                                    src={currentProduct.mainImage}
+                                    alt={currentProduct.name}
                                     className="w-full h-[400px] object-cover rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105"
                                 />
                                 <div
@@ -65,7 +79,7 @@ export function ProductDetails() {
                                 </div>
                             </div>
                             <div className="grid grid-cols-3 gap-4">
-                                {product.galleryImages.map((image, index) => (
+                                {currentProduct.galleryImages.map((image, index) => (
                                     <div
                                         key={index}
                                         className="aspect-square rounded-lg overflow-hidden shadow-md cursor-pointer group"
@@ -74,7 +88,7 @@ export function ProductDetails() {
                                         <div className="relative h-full">
                                             <img
                                                 src={image}
-                                                alt={`${product.name} view ${index + 1}`}
+                                                alt={`${currentProduct.name} view ${index + 1}`}
                                                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                                             />
                                             <div
@@ -86,13 +100,13 @@ export function ProductDetails() {
                         </div>
 
                         <div>
-                            <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
-                            <p className="text-2xl text-[#6F4E37] font-bold mb-6">{product.price}</p>
+                            <h1 className="text-4xl font-bold mb-4">{currentProduct.name}</h1>
+                            <p className="text-2xl text-[#6F4E37] font-bold mb-6">{currentProduct.price}</p>
 
                             <div className="space-y-6">
                                 <div>
                                     <h2 className="text-xl font-semibold mb-2">Description</h2>
-                                    <p className="text-gray-600">{product.description}</p>
+                                    <p className="text-gray-600">{currentProduct.description}</p>
                                 </div>
 
                                 <div>
@@ -100,11 +114,11 @@ export function ProductDetails() {
                                     <dl className="space-y-2">
                                         <div>
                                             <dt className="font-medium">Origin</dt>
-                                            <dd className="text-gray-600">{product.origin}</dd>
+                                            <dd className="text-gray-600">{currentProduct.origin}</dd>
                                         </div>
                                         <div>
                                             <dt className="font-medium">Roast Level</dt>
-                                            <dd className="text-gray-600">{product.roastLevel}</dd>
+                                            <dd className="text-gray-600">{currentProduct.roastLevel}</dd>
                                         </div>
                                     </dl>
                                 </div>
@@ -112,7 +126,7 @@ export function ProductDetails() {
                                 <div>
                                     <h2 className="text-xl font-semibold mb-2">Flavor Notes</h2>
                                     <div className="flex flex-wrap gap-2">
-                                        {product.flavorNotes.map((note, index) => (
+                                        {currentProduct.flavorNotes.map((note, index) => (
                                             <span
                                                 key={index}
                                                 className="px-3 py-1 bg-[#f8f3e9] rounded-full text-sm"

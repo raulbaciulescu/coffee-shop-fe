@@ -4,12 +4,39 @@ import {Product} from "../src/data/products.ts";
 
 export function useProducts() {
     const [products, setProducts] = useState<Product[]>([]);
+    const [currentProduct, setCurrentProduct] = useState<Product>();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    //
+    // useEffect(() => {
+    //     fetchProducts();
+    // }, []);
 
-    useEffect(() => {
-        fetchProducts();
-    }, []);
+    const getProductById = async (id: string) => {
+        try {
+            setLoading(true);
+            const response = await productService.getProductById(id);
+            let data: Product;
+            data = {
+                id: response.id,
+                name: response.name,
+                description: response.description,
+                galleryImages: response.galleryImages.map(image => 'data:image/jpeg;base64,' + image),
+                origin: response.origin,
+                roastLevel: "Medium",
+                flavorNotes: ["Chocolate", "Caramel", "Light citrus"],
+                mainImage: 'data:image/jpeg;base64,' + response.mainImage,
+                price: response.price,
+            };
+            console.log(data)
+            setCurrentProduct(data);
+            setError(null);
+        } catch (err) {
+            setError('Failed to fetch products');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchProducts = async () => {
         try {
@@ -71,22 +98,23 @@ export function useProducts() {
     }, [fetchProducts]);
 
     const updateProduct = useCallback(async (id: number, product: FormData) => {
-        // try {
-        //     setError(null);
-        //     const productDto = {
-        //         name: product.name,
-        //         description: product.description,
-        //         origin: product.origin,
-        //         roastLevel: "Medium",
-        //         imageUrl: product.image,
-        //         price: 3
-        //     }
-        //     await productService.update(productDto);
-        //     await fetchProducts(); // Refresh the list
-        // } catch (err) {
-        //     setError(err instanceof Error ? err.message : 'Failed to create product');
-        //     throw err;
-        // }
+        console.log(id)
+        try {
+            setError(null);
+            // const productDto = {
+            //     name: product.name,
+            //     description: product.description,
+            //     origin: product.origin,
+            //     roastLevel: "Medium",
+            //     imageUrl: product.image,
+            //     price: 3
+            // }
+            await productService.update(id, product);
+            await fetchProducts(); // Refresh the list
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to create product');
+            throw err;
+        }
     }, [fetchProducts]);
 
     return {
@@ -96,6 +124,8 @@ export function useProducts() {
         fetchProducts,
         createProduct,
         deleteProduct,
-        updateProduct
+        updateProduct,
+        getProductById,
+        currentProduct
     };
 }

@@ -127,7 +127,7 @@ export function Cart() {
                   </div>
                 </div>
                 <Link
-                    to="/checkout"
+                    to="/delivery"
                     className="w-full bg-[#6F4E37] text-white py-4 px-6 rounded-lg hover:bg-[#5D3D2B] transition-colors font-medium inline-block text-center"
                 >
                   Proceed to Checkout

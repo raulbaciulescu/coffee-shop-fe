@@ -22,7 +22,7 @@ export const productService = {
         return data;
     },
 
-    getById: async (id: string): Promise<Product> => {
+    getProductById: async (id: string): Promise<Product> => {
         const { data } = await api.get(`/products/${id}`);
         return data;
     },
@@ -32,11 +32,8 @@ export const productService = {
         return data;
     },
 
-    update: async (product: Product) => {
-        const { data } = await api.put('/products', {
-            ...product,
-            price: product.price.startsWith('$') ? product.price : `$${product.price}`,
-        });
+    update: async (id: number, product: FormData) => {
+        const { data } = await apiImage.put(`/products/${id}`, product);
         return data;
     },
 

@@ -18,6 +18,10 @@ export function Shop() {
   const { dispatch } = useCart();
   const { products, loading, error, fetchProducts } = useProducts();
 
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   const toggleRoastLevel = (level: RoastLevel) => {
     setSelectedRoastLevels(prev =>
         prev.includes(level)

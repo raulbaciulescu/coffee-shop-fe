@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { Plus, Loader, Save, Trash2, Image as ImageIcon, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {Product} from "../data/products.ts";
@@ -41,7 +41,11 @@ export function Admin() {
     const mainImageInputRef = useRef<HTMLInputElement>(null);
     const galleryImageInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
-    const { products, loading, error: productsError, createProduct, updateProduct, deleteProduct } = useProducts();
+    const { products, loading, error: productsError, createProduct, updateProduct, deleteProduct, fetchProducts } = useProducts();
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
 
     const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -112,11 +116,10 @@ export function Admin() {
 
         setIsLoading(true);
         setError(null);
-
         try {
             const formDataToSend = new FormData();
             formDataToSend.append('name', formData.name);
-            formDataToSend.append('price', formData.price.replace('$', ''));
+            formDataToSend.append('price', formData.price);
             if (formData.image) {
                 formDataToSend.append('mainImage', formData.image);
             }

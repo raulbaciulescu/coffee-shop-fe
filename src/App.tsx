@@ -9,6 +9,8 @@ import { Admin } from './pages/Admin';
 import { Navbar } from './components/Navbar';
 import { CartProvider } from './contexts/CartContext';
 import {Contact} from "./pages/Contact.tsx";
+import {Delivery} from "./pages/Delivery.tsx";
+import {ThankYou} from "./pages/ThankYou.tsx";
 
 function App() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -34,7 +36,8 @@ function App() {
               <Route path="/shop" element={<Shop />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/delivery" element={<Delivery />} />
+              <Route path="/thank-you" element={<ThankYou />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/contact" element={<Contact />} />
             </Routes>

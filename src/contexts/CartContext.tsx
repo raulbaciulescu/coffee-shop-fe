@@ -33,14 +33,14 @@ function cartReducer(state: CartState, action: CartAction): CartState {
               ? { ...item, quantity: item.quantity + 1 }
               : item
           ),
-          total: state.total + parseFloat(action.payload.price.replace('$', ''))
+          total: state.total + parseFloat(action.payload.price)
         };
       }
 
       return {
         ...state,
         items: [...state.items, { ...action.payload, quantity: 1 }],
-        total: state.total + parseFloat(action.payload.price.replace('$', ''))
+        total: state.total + parseFloat(action.payload.price)
       };
     }
 
@@ -51,7 +51,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return {
         ...state,
         items: state.items.filter(item => item.id !== action.payload),
-        total: state.total - (parseFloat(item.price.replace('$', '')) * item.quantity)
+        total: state.total - (parseFloat(item.price) * item.quantity)
       };
     }
 
@@ -68,7 +68,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
             ? { ...item, quantity: action.payload.quantity }
             : item
         ),
-        total: state.total + (parseFloat(item.price.replace('$', '')) * quantityDiff)
+        total: state.total + (parseFloat(item.price) * quantityDiff)
       };
     }
 
