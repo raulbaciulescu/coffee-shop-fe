@@ -13,7 +13,7 @@ export function Navbar({ isScrolled }: NavbarProps) {
   const { state } = useCart();
   const isActive = (path: string) => location.pathname === path;
   const cartItemsCount = state.items.reduce((total, item) => total + item.quantity, 0);
-  const isHome = location.pathname === '/';
+  const isHome = location.pathname === '/' || location.pathname === '/contact';
   const [isCartVisible, setIsCartVisible] = useState(false);
   const cartTimeoutRef = useRef<number>();
 
@@ -66,7 +66,7 @@ export function Navbar({ isScrolled }: NavbarProps) {
               <Link
                   to="/contact"
                   className={`font-medium transition-colors ${
-                      isActive('/contact')
+                      isActive('/shop')
                           ? 'text-[#6F4E37]'
                           : `${getTextColor(isScrolled, isHome)} ${getLinkHoverColor(isScrolled, isHome)}`
                   }`}

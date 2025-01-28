@@ -42,7 +42,6 @@ export const productService = {
     },
 };
 
-// Error handling interceptor
 api.interceptors.response.use(
     response => response,
     error => {

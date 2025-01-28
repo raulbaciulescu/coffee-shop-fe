@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import {Product} from "../data/products.ts";
 import {productService} from "../../services/api.ts";
 import {useProducts} from "../../hooks/hooks.ts";
+import {Footer} from "../components/Footer.tsx";
 
 type RoastLevel = 'Light' | 'Medium' | 'Dark';
 type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
@@ -240,6 +241,7 @@ export function Shop() {
             </div>
           </div>
         </div>
+        <Footer/>
       </div>
   );
 }

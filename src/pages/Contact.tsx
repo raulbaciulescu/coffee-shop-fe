@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Send, MapPin, Phone, Mail, Clock, Coffee, MessageSquare, Users, Heart } from 'lucide-react';
+import {Footer} from "../components/Footer.tsx";
 
 export function Contact() {
     const [formData, setFormData] = useState({
@@ -196,6 +197,7 @@ export function Contact() {
                     </div>
                 </div>
             </div>
+            <Footer/>
         </div>
     );
 }

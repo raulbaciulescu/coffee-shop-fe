@@ -3,7 +3,8 @@ import {Link, useParams} from 'react-router-dom';
 import {ArrowLeft, Coffee} from 'lucide-react';
 import {useCart} from '../contexts/CartContext';
 import {useProducts} from "../../hooks/hooks.ts";
-import {ImageGallery} from "../components/ImageGalelery.tsx";
+import {ImageGallery} from "../components/ImageGallery.tsx";
+import {Footer} from "../components/Footer.tsx";
 
 export function ProductDetails() {
     const {id} = useParams<{ id: string }>();
@@ -155,6 +156,7 @@ export function ProductDetails() {
                 onClose={() => setIsGalleryOpen(false)}
                 initialIndex={selectedImageIndex}
             />
+            <Footer/>
         </>
     );
 }
