@@ -39,7 +39,19 @@ export const productService = {
 
     delete: async (id: string) => {
         await api.delete(`/products/${id}`);
+    }
+};
+
+export const orderService = {
+    getAll: async () => {
+        const { data } = await api.get('/orders');
+        return data;
     },
+
+    updateOrderStatus: async (orderId: number, status: number) => {
+        const { data } = await api.put(`/orders/${orderId}/${status}`);
+        return data;
+    }
 };
 
 api.interceptors.response.use(

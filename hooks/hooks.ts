@@ -38,7 +38,7 @@ export function useProducts() {
         }
     };
 
-    const fetchProducts = async () => {
+        const fetchProducts = async () => {
         try {
             setLoading(true);
             const response = await productService.getAll();
