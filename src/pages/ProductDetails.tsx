@@ -17,6 +17,20 @@ export function ProductDetails() {
         getProductById(id!);
     }, []);
 
+    useEffect(() => {
+        // Update page title when product loads
+        if (currentProduct) {
+            document.title = `${currentProduct.name} | Daily Brew`;
+        } else {
+            document.title = 'Product | Daily Brew';
+        }
+
+        // Reset title when component unmounts
+        return () => {
+            document.title = 'Daily Brew';
+        };
+    }, [currentProduct]);
+
     if (loading) {
         return (
             <div className="min-h-screen pt-24 flex items-center justify-center">
@@ -56,9 +70,9 @@ export function ProductDetails() {
         <>
             <div className="min-h-screen pt-24 pb-16 px-4">
                 <div className="max-w-6xl mx-auto">
-                    <Link to="/" className="inline-flex items-center text-[#6F4E37] hover:underline mb-8">
+                    <Link to="/shop" className="inline-flex items-center text-[#6F4E37] hover:underline mb-8">
                         <ArrowLeft className="w-4 h-4 mr-2"/>
-                        Back to Home
+                        Back to Shop
                     </Link>
 
                     <div className="grid md:grid-cols-2 gap-8">
@@ -102,7 +116,7 @@ export function ProductDetails() {
 
                         <div>
                             <h1 className="text-4xl font-bold mb-4">{currentProduct.name}</h1>
-                            <p className="text-2xl text-[#6F4E37] font-bold mb-6">{currentProduct.price}</p>
+                            <p className="text-2xl text-[#6F4E37] font-bold mb-6">{currentProduct.price} Lei</p>
 
                             <div className="space-y-6">
                                 <div>

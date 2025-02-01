@@ -2,10 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, SlidersHorizontal, Coffee, ChevronDown, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import {Product} from "../data/products.ts";
-import {productService} from "../../services/api.ts";
-import {useProducts} from "../../hooks/useProducts.ts";
-import {Footer} from "../components/Footer.tsx";
+import { Product } from "../data/products.ts";
+import { useProducts } from "../../hooks/useProducts.ts";
+import { Footer } from "../components/Footer.tsx";
 
 type RoastLevel = 'Light' | 'Medium' | 'Dark';
 type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc';
@@ -21,6 +20,10 @@ export function Shop() {
 
   useEffect(() => {
     fetchProducts();
+    document.title = 'Shop | Daily Brew';
+    return () => {
+      document.title = 'Daily Brew';
+    };
   }, []);
 
   const toggleRoastLevel = (level: RoastLevel) => {
@@ -35,21 +38,60 @@ export function Shop() {
     dispatch({ type: 'ADD_ITEM', payload: product });
   };
 
-  // Sort products
-  const sortedProducts = [...products].sort((a, b) => {
-    switch (sortBy) {
-      case 'name-asc':
-        return a.name.localeCompare(b.name);
-      case 'name-desc':
-        return b.name.localeCompare(a.name);
-      case 'price-asc':
-        return a.price - b.price;
-      case 'price-desc':
-        return b.price - a.price;
-      default:
-        return 0;
+  // Filter and sort products
+  const filteredAndSortedProducts = useMemo(() => {
+    let filtered = [...products];
+
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(product =>
+          product.name.toLowerCase().includes(query) ||
+          product.description.toLowerCase().includes(query) ||
+          product.origin.toLowerCase().includes(query) ||
+          product.flavorNotes.some(note => note.toLowerCase().includes(query))
+      );
     }
-  });
+
+    // Apply roast level filter
+    if (selectedRoastLevels.length > 0) {
+      filtered = filtered.filter(product =>
+          selectedRoastLevels.includes(product.roastLevel as RoastLevel)
+      );
+    }
+
+    // Apply price filter
+    filtered = filtered.filter(product => {
+      const price = parseFloat(product.price);
+      return price >= priceRange[0] && price <= priceRange[1];
+    });
+
+    // Sort products
+    return filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'price-asc':
+          return a.price - b.price;
+        case 'price-desc':
+          return b.price - a.price;
+        default:
+          return 0;
+      }
+    });
+  }, [products, searchQuery, selectedRoastLevels, priceRange, sortBy]);
+
+  // Find max price for range input
+  const maxPrice = useMemo(() => {
+    if (products.length === 0) return 10;
+    return Math.ceil(Math.max(...products.map(p => p.price)));
+  }, [products]);
+
+  useEffect(() => {
+    setPriceRange([0, maxPrice]);
+  }, [maxPrice]);
 
   if (loading) {
     return (
@@ -161,7 +203,7 @@ export function Shop() {
                     <input
                         type="range"
                         min="0"
-                        max="10"
+                        max={maxPrice}
                         step="0.5"
                         value={priceRange[1]}
                         onChange={(e) => setPriceRange([priceRange[0], parseFloat(e.target.value)])}
@@ -184,7 +226,10 @@ export function Shop() {
             {/* Product Grid */}
             <div className="flex-1">
               {/* Sort Dropdown */}
-              <div className="flex justify-end mb-6">
+              <div className="flex justify-between items-center mb-6">
+                <p className="text-gray-600">
+                  Showing {filteredAndSortedProducts.length} products
+                </p>
                 <div className="relative">
                   <select
                       value={sortBy}
@@ -200,48 +245,56 @@ export function Shop() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {sortedProducts.map((product) => (
-                    <div key={product.id} className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
-                      <Link to={`/product/${product.id}`} className="block">
-                        <div className="aspect-square">
-                          <img
-                              src={product.mainImage}
-                              alt={product.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                        <div className="p-4">
-                          <h3 className="text-lg font-semibold mb-2 text-[#2C1810]">{product.name}</h3>
-                          <p className="text-[#6F4E37] font-bold">{product.price} Lei</p>
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            {product.flavorNotes.slice(0, 2).map((note, index) => (
-                                <span
-                                    key={index}
-                                    className="px-2 py-1 bg-[#f8f3e9] rounded-full text-xs text-[#6F4E37]"
-                                >
-                            {note}
-                          </span>
-                            ))}
+              {filteredAndSortedProducts.length === 0 ? (
+                  <div className="text-center py-12 bg-white rounded-xl shadow-md">
+                    <Coffee className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
+                    <p className="text-gray-600">Try adjusting your filters or search terms</p>
+                  </div>
+              ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredAndSortedProducts.map((product) => (
+                        <div key={product.id} className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
+                          <Link to={`/product/${product.id}`} className="block">
+                            <div className="aspect-square">
+                              <img
+                                  src={product.mainImage}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              />
+                            </div>
+                            <div className="p-4">
+                              <h3 className="text-lg font-semibold mb-2 text-[#2C1810]">{product.name}</h3>
+                              <p className="text-[#6F4E37] font-bold">{product.price}</p>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {product.flavorNotes.slice(0, 2).map((note, index) => (
+                                    <span
+                                        key={index}
+                                        className="px-2 py-1 bg-[#f8f3e9] rounded-full text-xs text-[#6F4E37]"
+                                    >
+                              {note}
+                            </span>
+                                ))}
+                              </div>
+                            </div>
+                          </Link>
+                          <div className="px-4 pb-4">
+                            <button
+                                onClick={() => addToCart(product)}
+                                className="w-full bg-[#6F4E37] text-white py-2 px-4 rounded-lg hover:bg-[#5D3D2B] transition-colors flex items-center justify-center gap-2"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              Add to Cart
+                            </button>
                           </div>
                         </div>
-                      </Link>
-                      <div className="px-4 pb-4">
-                        <button
-                            onClick={() => addToCart(product)}
-                            className="w-full bg-[#6F4E37] text-white py-2 px-4 rounded-lg hover:bg-[#5D3D2B] transition-colors flex items-center justify-center gap-2"
-                        >
-                          <ShoppingCart className="w-4 h-4" />
-                          Add to Cart
-                        </button>
-                      </div>
-                    </div>
-                ))}
-              </div>
+                    ))}
+                  </div>
+              )}
             </div>
           </div>
         </div>
-        <Footer/>
+        <Footer />
       </div>
   );
 }

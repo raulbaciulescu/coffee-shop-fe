@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Home } from './pages/Home';
 import { Shop } from './pages/Shop';
 import { ProductDetails } from './pages/ProductDetails';
@@ -8,9 +9,9 @@ import { Checkout } from './pages/Checkout';
 import { Admin } from './pages/Admin';
 import { Navbar } from './components/Navbar';
 import { CartProvider } from './contexts/CartContext';
-import {Contact} from "./pages/Contact.tsx";
-import {Delivery} from "./pages/Delivery.tsx";
-import {ThankYou} from "./pages/ThankYou.tsx";
+import { Contact } from "./pages/Contact.tsx";
+import { Delivery } from "./pages/Delivery.tsx";
+import { ThankYou } from "./pages/ThankYou.tsx";
 
 function App() {
   const [isScrolled, setIsScrolled] = useState(false);
