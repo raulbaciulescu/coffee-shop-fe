@@ -1,84 +1,140 @@
-import React from 'react';
-import { Helmet } from 'react-helmet-async';
-import { Coffee, Clock, MapPin, Phone } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Coffee, Clock, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { products } from '../data/products';
+import { useProducts } from "../../hooks/useProducts";
 import { Footer } from "../components/Footer.tsx";
 
 export function Home() {
+    const { products, loading, error, fetchProducts } = useProducts();
+
+    useEffect(() => {
+        fetchProducts();
+        document.title = 'Daily Brew';
+    }, []);
+
+    // Get top 3 most expensive products
+    const topProducts = [...products]
+        .sort((a, b) => parseFloat(b.price) - parseFloat(a.price))
+        .slice(0, 3);
+
     return (
         <>
-            <Helmet>
-                <title>Daily Brew - Premium Coffee Shop</title>
-                <meta name="description" content="Discover artisanal coffee at Daily Brew. We offer premium, freshly roasted coffee beans sourced from the world's finest coffee regions." />
-                <link rel="canonical" href="https://dailybrew.com/" />
-            </Helmet>
-
-            <main>
-                <div
-                    className="h-screen bg-cover bg-center relative"
-                    style={{
-                        backgroundImage: 'url("https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80")'
-                    }}
-                >
-                    <div className="absolute inset-0 bg-black/50" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center text-white">
-                            <h1 className="text-5xl font-bold mb-4">Daily Brew</h1>
-                            <p className="text-xl">Artisanal Coffee & Good Vibes</p>
-                        </div>
+            {/* Hero Section with Parallax and Fade-in Effect */}
+            <div
+                className="h-screen bg-cover bg-center relative overflow-hidden"
+                style={{
+                    backgroundImage: 'url("https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80")'
+                }}
+            >
+                <div className="absolute inset-0 bg-black/50" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center text-white animate-fade-in">
+                        <h1 className="text-6xl font-bold mb-4 animate-slide-up">Daily Brew</h1>
+                        <p className="text-xl animate-slide-up-delay">Artisanal Coffee & Good Vibes</p>
+                        <Link
+                            to="/shop"
+                            className="inline-block mt-8 px-8 py-3 bg-white/20 backdrop-blur-sm text-white rounded-full
+                       hover:bg-white/30 transition-all duration-300 animate-slide-up-delay-2"
+                        >
+                            Explore Our Coffee
+                        </Link>
                     </div>
                 </div>
+            </div>
 
-                <section className="max-w-6xl mx-auto py-16 px-4" aria-label="Features">
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <article className="text-center">
-                            <Coffee className="w-12 h-12 mx-auto mb-4 text-[#6F4E37]" />
-                            <h2 className="text-xl font-semibold mb-2">Premium Beans</h2>
-                            <p className="text-gray-600">Sourced from the finest coffee regions</p>
-                        </article>
-                        <article className="text-center">
-                            <Clock className="w-12 h-12 mx-auto mb-4 text-[#6F4E37]" />
-                            <h2 className="text-xl font-semibold mb-2">Fresh Daily</h2>
-                            <p className="text-gray-600">Roasted in small batches every morning</p>
-                        </article>
-                        <article className="text-center">
-                            <MapPin className="w-12 h-12 mx-auto mb-4 text-[#6F4E37]" />
-                            <h2 className="text-xl font-semibold mb-2">Local Love</h2>
-                            <p className="text-gray-600">Supporting local coffee farmers</p>
-                        </article>
+            {/* Features with Hover Animations */}
+            <div className="max-w-6xl mx-auto py-24 px-4">
+                <div className="grid md:grid-cols-3 gap-12">
+                    <div className="text-center transform hover:-translate-y-2 transition-transform duration-300 group">
+                        <div className="relative inline-block">
+                            <div className="absolute inset-0 bg-[#6F4E37]/10 rounded-full scale-110 group-hover:scale-125 transition-transform duration-300" />
+                            <Coffee className="w-16 h-16 mx-auto mb-6 text-[#6F4E37] relative z-10 transform group-hover:rotate-12 transition-transform duration-300" />
+                        </div>
+                        <h3 className="text-2xl font-semibold mb-3">Premium Beans</h3>
+                        <p className="text-gray-600 leading-relaxed">Sourced from the finest coffee regions around the world</p>
                     </div>
-                </section>
+                    <div className="text-center transform hover:-translate-y-2 transition-transform duration-300 group">
+                        <div className="relative inline-block">
+                            <div className="absolute inset-0 bg-[#6F4E37]/10 rounded-full scale-110 group-hover:scale-125 transition-transform duration-300" />
+                            <Clock className="w-16 h-16 mx-auto mb-6 text-[#6F4E37] relative z-10 transform group-hover:rotate-12 transition-transform duration-300" />
+                        </div>
+                        <h3 className="text-2xl font-semibold mb-3">Fresh Daily</h3>
+                        <p className="text-gray-600 leading-relaxed">Roasted in small batches every morning</p>
+                    </div>
+                    <div className="text-center transform hover:-translate-y-2 transition-transform duration-300 group">
+                        <div className="relative inline-block">
+                            <div className="absolute inset-0 bg-[#6F4E37]/10 rounded-full scale-110 group-hover:scale-125 transition-transform duration-300" />
+                            <MapPin className="w-16 h-16 mx-auto mb-6 text-[#6F4E37] relative z-10 transform group-hover:rotate-12 transition-transform duration-300" />
+                        </div>
+                        <h3 className="text-2xl font-semibold mb-3">Local Love</h3>
+                        <p className="text-gray-600 leading-relaxed">Supporting local coffee farmers and communities</p>
+                    </div>
+                </div>
+            </div>
 
-                <section className="bg-white py-16" aria-label="Featured Products">
-                    <div className="max-w-6xl mx-auto px-4">
-                        <h2 className="text-3xl font-bold text-center mb-12">Our Favorites</h2>
-                        <div className="grid md:grid-cols-3 gap-8">
-                            {products.map((product) => (
-                                <article
+            {/* Featured Products with Staggered Animation */}
+            <div className="bg-white py-24">
+                <div className="max-w-6xl mx-auto px-4">
+                    <h2 className="text-4xl font-bold text-center mb-16">Premium Selection</h2>
+                    {loading ? (
+                        <div className="flex justify-center">
+                            <Coffee className="w-12 h-12 animate-spin text-[#6F4E37]" />
+                        </div>
+                    ) : error ? (
+                        <div className="text-center text-red-500">
+                            Failed to load products. Please try again later.
+                        </div>
+                    ) : (
+                        <div className="grid md:grid-cols-3 gap-12">
+                            {topProducts.map((product, index) => (
+                                <Link
                                     key={product.id}
-                                    className="bg-[#f8f3e9] rounded-lg overflow-hidden shadow-md transition-transform hover:scale-105"
+                                    to={`/product/${product.id}`}
+                                    className={`group bg-[#f8f3e9] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl 
+                           transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up`}
+                                    style={{ animationDelay: `${index * 200}ms` }}
                                 >
-                                    <Link to={`/product/${product.id}`}>
+                                    <div className="aspect-square overflow-hidden">
                                         <img
                                             src={product.mainImage}
                                             alt={product.name}
-                                            className="w-full h-48 object-cover"
-                                            loading="lazy"
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
-                                        <div className="p-4">
-                                            <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-                                            <p className="text-[#6F4E37] font-bold">{product.price}</p>
+                                    </div>
+                                    <div className="p-8">
+                                        <h3 className="text-2xl font-semibold mb-3 text-[#2C1810] group-hover:text-[#6F4E37] transition-colors">
+                                            {product.name}
+                                        </h3>
+                                        <p className="text-[#6F4E37] font-bold text-xl mb-4">{product.price}</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {product.flavorNotes.map((note, index) => (
+                                                <span
+                                                    key={index}
+                                                    className="px-4 py-1.5 bg-white rounded-full text-sm text-[#6F4E37] transform transition-transform duration-300 hover:scale-105"
+                                                >
+                          {note}
+                        </span>
+                                            ))}
                                         </div>
-                                    </Link>
-                                </article>
+                                    </div>
+                                </Link>
                             ))}
                         </div>
+                    )}
+                    <div className="text-center mt-16">
+                        <Link
+                            to="/shop"
+                            className="inline-block bg-[#6F4E37] text-white px-10 py-4 rounded-full text-lg font-medium
+                       hover:bg-[#5D3D2B] transform hover:-translate-y-1 transition-all duration-300
+                       shadow-lg hover:shadow-xl"
+                        >
+                            View All Products
+                        </Link>
                     </div>
-                </section>
-            </main>
+                </div>
+            </div>
 
-            <Footer />
+            <Footer/>
         </>
     );
 }

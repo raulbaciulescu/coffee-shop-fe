@@ -1,21 +1,23 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {Link, useParams} from 'react-router-dom';
-import {ArrowLeft, Coffee} from 'lucide-react';
+import {ArrowLeft, Coffee, ShoppingCart} from 'lucide-react';
 import {useCart} from '../contexts/CartContext';
 import {useProducts} from "../../hooks/useProducts.ts";
 import {ImageGallery} from "../components/ImageGallery.tsx";
 import {Footer} from "../components/Footer.tsx";
+import {Product} from "../data/products.ts";
 
 export function ProductDetails() {
     const {id} = useParams<{ id: string }>();
-    const {currentProduct, loading, error, getProductById} = useProducts();
+    const {currentProduct, products, loading, error, getProductById, fetchProducts} = useProducts();
     const {dispatch} = useCart();
     const [isGalleryOpen, setIsGalleryOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
     useEffect(() => {
         getProductById(id!);
-    }, []);
+        fetchProducts(); // Fetch all products for similar products section
+    }, [id]);
 
     useEffect(() => {
         // Update page title when product loads
@@ -30,6 +32,50 @@ export function ProductDetails() {
             document.title = 'Daily Brew';
         };
     }, [currentProduct]);
+
+    // Calculate similarity score between two products
+    const calculateSimilarity = (product1: Product, product2: Product) => {
+        let score = 0;
+
+        // Same roast level
+        if (product1.roastLevel === product2.roastLevel) {
+            score += 3;
+        }
+
+        // Shared flavor notes
+        const sharedNotes = product1.flavorNotes.filter(note =>
+            product2.flavorNotes.includes(note)
+        );
+        score += sharedNotes.length * 2;
+
+        // Similar price range (within 20%)
+        const price1 = parseFloat(product1.price);
+        const price2 = parseFloat(product2.price);
+        if (Math.abs(price1 - price2) / price1 <= 0.2) {
+            score += 1;
+        }
+
+        // Same origin
+        if (product1.origin === product2.origin) {
+            score += 2;
+        }
+
+        return score;
+    };
+
+    // Get similar products
+    const similarProducts = useMemo(() => {
+        if (!currentProduct || !products.length) return [];
+
+        return products
+            .filter(product => product.id !== currentProduct.id)
+            .map(product => ({
+                ...product,
+                similarityScore: calculateSimilarity(currentProduct, product)
+            }))
+            .sort((a, b) => b.similarityScore - a.similarityScore)
+            .slice(0, 3);
+    }, [currentProduct, products]);
 
     if (loading) {
         return (
@@ -75,7 +121,7 @@ export function ProductDetails() {
                         Back to Shop
                     </Link>
 
-                    <div className="grid md:grid-cols-2 gap-8">
+                    <div className="grid md:grid-cols-2 gap-8 mb-16">
                         <div className="space-y-4">
                             <div
                                 className="relative cursor-pointer group overflow-hidden rounded-lg"
@@ -88,9 +134,9 @@ export function ProductDetails() {
                                 />
                                 <div
                                     className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <span className="text-white text-sm font-medium bg-black/50 px-4 py-2 rounded-full">
-                    View Gallery
-                  </span>
+                                    <span className="text-white text-sm font-medium bg-black/50 px-4 py-2 rounded-full">
+                                        View Gallery
+                                    </span>
                                 </div>
                             </div>
                             <div className="grid grid-cols-3 gap-4">
@@ -116,7 +162,7 @@ export function ProductDetails() {
 
                         <div>
                             <h1 className="text-4xl font-bold mb-4">{currentProduct.name}</h1>
-                            <p className="text-2xl text-[#6F4E37] font-bold mb-6">{currentProduct.price} Lei</p>
+                            <p className="text-2xl text-[#6F4E37] font-bold mb-6">{currentProduct.price}</p>
 
                             <div className="space-y-6">
                                 <div>
@@ -146,8 +192,8 @@ export function ProductDetails() {
                                                 key={index}
                                                 className="px-3 py-1 bg-[#f8f3e9] rounded-full text-sm"
                                             >
-                        {note}
-                      </span>
+                                                {note}
+                                            </span>
                                         ))}
                                     </div>
                                 </div>
@@ -161,6 +207,52 @@ export function ProductDetails() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Similar Products Section */}
+                    {similarProducts.length > 0 && (
+                        <div className="border-t pt-16">
+                            <h2 className="text-3xl font-bold mb-8">Similar Products</h2>
+                            <div className="grid md:grid-cols-3 gap-8">
+                                {similarProducts.map((product) => (
+                                    <Link
+                                        key={product.id}
+                                        to={`/product/${product.id}`}
+                                        className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 group"
+                                    >
+                                        <div className="aspect-square overflow-hidden">
+                                            <img
+                                                src={product.mainImage}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                            />
+                                        </div>
+                                        <div className="p-6">
+                                            <h3 className="text-xl font-semibold mb-2 text-[#2C1810]">{product.name}</h3>
+                                            <p className="text-[#6F4E37] font-bold mb-3">{product.price}</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {product.flavorNotes.map((note, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="px-3 py-1 bg-[#f8f3e9] rounded-full text-sm text-[#6F4E37]"
+                                                    >
+                                                        {note}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <div className="mt-4 flex items-center justify-between">
+                                                <span className="text-sm text-gray-500">
+                                                    {product.roastLevel} Roast
+                                                </span>
+                                                <span className="text-sm text-gray-500">
+                                                    {product.origin}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
