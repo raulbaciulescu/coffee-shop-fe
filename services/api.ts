@@ -51,7 +51,11 @@ export const orderService = {
     updateOrderStatus: async (orderId: number, status: number) => {
         const { data } = await api.put(`/orders/${orderId}/${status}`);
         return data;
-    }
+    },
+    create: async (order: Omit<Order, 'id' | 'status' | 'createdAt'>) => {
+        const { data } = await api.post('/orders', order);
+        return data;
+    },
 };
 
 api.interceptors.response.use(

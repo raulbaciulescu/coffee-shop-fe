@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Package, Clock, ChevronDown } from 'lucide-react';
 
 interface OrdersProps {
@@ -9,6 +9,8 @@ interface OrdersProps {
 }
 
 export function Orders({ orders, loading, error, onUpdateStatus }: OrdersProps) {
+    const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+
     const getStatusColor = (status: Order['status']) => {
         switch (status) {
             case 'pending':
@@ -29,6 +31,22 @@ export function Orders({ orders, loading, error, onUpdateStatus }: OrdersProps) 
             minute: '2-digit'
         });
     };
+
+    const handleStatusClick = (orderId: string) => {
+        setOpenDropdownId(openDropdownId === orderId ? null : orderId);
+    };
+
+    // Close dropdown when clicking outside
+    React.useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (openDropdownId && !(event.target as Element).closest('.status-dropdown')) {
+                setOpenDropdownId(null);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [openDropdownId]);
 
     if (loading) {
         return (
@@ -98,30 +116,34 @@ export function Orders({ orders, loading, error, onUpdateStatus }: OrdersProps) 
                                         <div key={index} className="text-sm text-gray-900">
                                             {item.quantity}x {item.name}
                                             <span className="text-gray-500 ml-1">
-                          (${item.price.toFixed(2)})
-                        </span>
+                                                    (${item.price.toFixed(2)})
+                                                </span>
                                         </div>
                                     ))}
                                 </div>
                             </td>
                             <td className="px-6 py-4">
-                                <div className="relative inline-block text-left">
-                                    <div className="group">
-                                        <button
-                                            type="button"
-                                            className={`inline-flex items-center px-3 py-1 rounded-full ${getStatusColor(
-                                                order.status
-                                            )} text-xs font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500`}
-                                        >
-                                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                                            <ChevronDown className="ml-1 h-4 w-4" />
-                                        </button>
-                                        <div className="hidden group-hover:block absolute z-10 mt-1 w-36 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                <div className="relative inline-block text-left status-dropdown">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleStatusClick(order.id)}
+                                        className={`inline-flex items-center px-3 py-1 rounded-full ${getStatusColor(
+                                            order.status
+                                        )} text-xs font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500`}
+                                    >
+                                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                        <ChevronDown className="ml-1 h-4 w-4" />
+                                    </button>
+                                    {openDropdownId === order.id && (
+                                        <div className="absolute z-10 mt-1 w-36 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                                             <div className="py-1" role="menu" aria-orientation="vertical">
                                                 {(['pending', 'processing', 'delivered'] as const).map((status) => (
                                                     <button
                                                         key={status}
-                                                        onClick={() => onUpdateStatus(order.id, status)}
+                                                        onClick={() => {
+                                                            onUpdateStatus(order.id, status);
+                                                            setOpenDropdownId(null);
+                                                        }}
                                                         className={`block w-full text-left px-4 py-2 text-sm ${
                                                             order.status === status
                                                                 ? 'bg-gray-100 text-gray-900'
@@ -134,7 +156,7 @@ export function Orders({ orders, loading, error, onUpdateStatus }: OrdersProps) 
                                                 ))}
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             </td>
                             <td className="px-6 py-4 text-sm font-medium text-gray-900">
