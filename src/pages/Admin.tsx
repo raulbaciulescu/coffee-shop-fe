@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Loader, Save, Trash2, Image as ImageIcon, Upload, Package, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Product } from "../data/products.ts";
-import { useProducts } from "../../hooks/hooks.ts";
+import { useProducts } from "../../hooks/useProducts.ts";
 import { useOrders } from "../../hooks/useOrders.ts";
 import {Orders} from "../components/Orders.tsx";
 

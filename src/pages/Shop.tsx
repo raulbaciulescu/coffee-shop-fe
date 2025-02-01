@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal, Coffee, ChevronDown, ShoppingCart } from 'lu
 import { useCart } from '../contexts/CartContext';
 import {Product} from "../data/products.ts";
 import {productService} from "../../services/api.ts";
-import {useProducts} from "../../hooks/hooks.ts";
+import {useProducts} from "../../hooks/useProducts.ts";
 import {Footer} from "../components/Footer.tsx";
 
 type RoastLevel = 'Light' | 'Medium' | 'Dark';

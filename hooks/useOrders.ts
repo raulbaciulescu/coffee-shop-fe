@@ -54,6 +54,21 @@ export function useOrders() {
         }
     }, []);
 
+    const createOrder = useCallback(async (orderData: Omit<Order, 'id' | 'createdAt' | 'status' | 'total'>) => {
+        setError(null);
+        setLoading(true);
+        try {
+            const newOrder = await orderService.create(orderData);
+            setOrders(prevOrders => [...prevOrders, newOrder]);
+            return newOrder;
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to create order');
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     return {
         orders,
         loading,

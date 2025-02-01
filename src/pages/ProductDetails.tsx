@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import {ArrowLeft, Coffee} from 'lucide-react';
 import {useCart} from '../contexts/CartContext';
-import {useProducts} from "../../hooks/hooks.ts";
+import {useProducts} from "../../hooks/useProducts.ts";
 import {ImageGallery} from "../components/ImageGallery.tsx";
 import {Footer} from "../components/Footer.tsx";
 
