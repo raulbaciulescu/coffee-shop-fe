@@ -228,7 +228,7 @@ export function ProductDetails() {
                                         </div>
                                         <div className="p-6">
                                             <h3 className="text-xl font-semibold mb-2 text-[#2C1810]">{product.name}</h3>
-                                            <p className="text-[#6F4E37] font-bold mb-3">{product.price}</p>
+                                            <p className="text-[#6F4E37] font-bold mb-3">{product.price} Lei</p>
                                             <div className="flex flex-wrap gap-2">
                                                 {product.flavorNotes.map((note, index) => (
                                                     <span

@@ -24,7 +24,6 @@ export function useProducts() {
                 mainImage: response.mainImage,
                 price: response.price,
             };
-            console.log(data)
             setCurrentProduct(data);
             setError(null);
         } catch (err) {

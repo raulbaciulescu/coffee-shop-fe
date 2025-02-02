@@ -40,39 +40,41 @@ export function Cart() {
       <div className="min-h-screen pt-24 pb-16 px-4 bg-[#f8f3e9]">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-[#2C1810]">Shopping Cart</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-[#2C1810]">Shopping Cart</h1>
             <Link
                 to="/shop"
                 className="inline-flex items-center text-[#6F4E37] hover:text-[#5D3D2B] transition-colors"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Continue Shopping
+              <span className="hidden md:inline">Continue Shopping</span>
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="md:col-span-2 space-y-4">
+          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            <div className="md:col-span-2 space-y-4 md:space-y-6">
               {state.items.map((item) => (
                   <div
                       key={item.id}
                       className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300"
                   >
-                    <div className="flex gap-6">
-                      <img
-                          src={item.mainImage}
-                          alt={item.name}
-                          className="w-32 h-32 object-cover rounded-lg"
-                      />
-                      <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row gap-6">
+                      <div className="w-full sm:w-auto">
+                        <img
+                            src={item.mainImage}
+                            alt={item.name}
+                            className="w-full sm:w-32 h-48 sm:h-32 object-cover rounded-lg"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="text-xl font-semibold text-[#2C1810] mb-1">{item.name}</h3>
-                            <p className="text-[#6F4E37] font-bold text-lg">{item.price}</p>
-                            <div className="mt-2 flex flex-wrap gap-2">
+                            <h3 className="text-xl font-semibold text-[#2C1810] mb-2">{item.name}</h3>
+                            <p className="text-[#6F4E37] font-bold text-lg mb-3">{item.price}</p>
+                            <div className="flex flex-wrap gap-2 mb-4">
                               {item.flavorNotes.slice(0, 2).map((note, index) => (
                                   <span
                                       key={index}
-                                      className="px-2 py-1 bg-[#f8f3e9] rounded-full text-xs text-[#6F4E37]"
+                                      className="px-3 py-1.5 bg-[#f8f3e9] rounded-full text-sm text-[#6F4E37]"
                                   >
                               {note}
                             </span>
@@ -83,22 +85,24 @@ export function Cart() {
                               onClick={() => removeItem(item.id)}
                               className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-full"
                           >
-                            <Trash2 className="w-5 h-5" />
+                            <Trash2 className="w-6 h-6" />
                           </button>
                         </div>
-                        <div className="mt-4 flex items-center space-x-2">
+                        <div className="flex items-center space-x-3 mt-auto">
                           <button
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="p-2 rounded-full hover:bg-[#f8f3e9] text-[#6F4E37] transition-colors"
+                              className="p-2.5 rounded-full hover:bg-[#f8f3e9] text-[#6F4E37] transition-colors"
                           >
-                            <Minus className="w-4 h-4" />
+                            <Minus className="w-5 h-5" />
                           </button>
-                          <span className="w-12 text-center font-medium text-[#2C1810]">{item.quantity}</span>
+                          <span className="w-12 text-center font-medium text-lg text-[#2C1810]">
+                        {item.quantity}
+                      </span>
                           <button
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="p-2 rounded-full hover:bg-[#f8f3e9] text-[#6F4E37] transition-colors"
+                              className="p-2.5 rounded-full hover:bg-[#f8f3e9] text-[#6F4E37] transition-colors"
                           >
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-5 h-5" />
                           </button>
                         </div>
                       </div>

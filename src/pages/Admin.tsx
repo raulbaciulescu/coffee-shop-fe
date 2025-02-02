@@ -498,7 +498,7 @@ export function Admin() {
                                             </div>
                                             <div className="flex-1">
                                                 <h3 className="font-semibold text-[#2C1810]">{product.name}</h3>
-                                                <p className="text-[#6F4E37]">{product.price}</p>
+                                                <p className="text-[#6F4E37]">{product.price} Lei</p>
                                                 <div className="mt-1 flex flex-wrap gap-1">
                                                     {product.flavorNotes.map((note, index) => (
                                                         <span

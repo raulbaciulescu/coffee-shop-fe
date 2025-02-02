@@ -62,21 +62,24 @@ export function Shop() {
 
     // Apply price filter
     filtered = filtered.filter(product => {
-      const price = parseFloat(product.price);
+      const price = product.price;
       return price >= priceRange[0] && price <= priceRange[1];
     });
 
     // Sort products
     return filtered.sort((a, b) => {
+      const priceA = a.price;
+      const priceB = b.price
+
       switch (sortBy) {
         case 'name-asc':
           return a.name.localeCompare(b.name);
         case 'name-desc':
           return b.name.localeCompare(a.name);
         case 'price-asc':
-          return a.price - b.price;
+          return priceA - priceB;
         case 'price-desc':
-          return b.price - a.price;
+          return priceB - priceA;
         default:
           return 0;
       }
@@ -95,10 +98,10 @@ export function Shop() {
 
   if (loading) {
     return (
-        <div className="min-h-screen pt-24 flex items-center justify-center">
+        <div className="min-h-screen pt-24 flex items-center justify-center bg-[#f8f3e9]">
           <div className="text-center">
             <Coffee className="w-12 h-12 animate-spin mx-auto mb-4 text-[#6F4E37]" />
-            <p className="text-[#2C1810]">Loading products...</p>
+            <p className="text-[#2C1810] animate-pulse">Loading products...</p>
           </div>
         </div>
     );
@@ -106,12 +109,15 @@ export function Shop() {
 
   if (error) {
     return (
-        <div className="min-h-screen pt-24 flex items-center justify-center">
-          <div className="text-center">
+        <div className="min-h-screen pt-24 flex items-center justify-center bg-[#f8f3e9]">
+          <div className="text-center bg-white p-8 rounded-2xl shadow-lg max-w-md mx-4">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Coffee className="w-8 h-8 text-red-500" />
+            </div>
             <p className="text-red-500 mb-4">{error}</p>
             <button
                 onClick={fetchProducts}
-                className="text-[#6F4E37] hover:underline"
+                className="text-[#6F4E37] hover:text-[#5D3D2B] transition-colors underline"
             >
               Try again
             </button>
@@ -121,12 +127,12 @@ export function Shop() {
   }
 
   return (
-      <div className="min-h-screen pt-16">
+      <div className="min-h-screen pt-16 bg-[#f8f3e9]">
         {/* Mobile Filters Button */}
         <div className="md:hidden fixed bottom-4 right-4 z-50">
           <button
               onClick={() => setShowMobileFilters(!showMobileFilters)}
-              className="bg-[#6F4E37] text-white p-4 rounded-full shadow-lg"
+              className="bg-[#6F4E37] text-white p-4 rounded-full shadow-lg hover:bg-[#5D3D2B] transition-colors"
           >
             <SlidersHorizontal className="w-6 h-6" />
           </button>
@@ -146,37 +152,37 @@ export function Shop() {
                     <h2 className="text-xl font-bold">Filters</h2>
                     <button
                         onClick={() => setShowMobileFilters(false)}
-                        className="text-gray-500"
+                        className="text-gray-500 hover:text-gray-700"
                     >
                       ×
                     </button>
                   </div>
               )}
 
-              <div className="bg-white rounded-2xl shadow-lg p-6 space-y-8">
+              <div className="bg-white rounded-2xl shadow-lg p-6 space-y-8 animate-fade-in">
                 <div className="flex items-center space-x-3 pb-6 border-b border-gray-100">
                   <Coffee className="w-6 h-6 text-[#6F4E37]" />
                   <h2 className="text-xl font-bold text-[#2C1810]">Filters</h2>
                 </div>
 
                 {/* Search */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3 text-[#2C1810]">Search</h3>
-                  <div className="relative">
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-[#2C1810]">Search</h3>
+                  <div className="relative group">
                     <input
                         type="text"
                         placeholder="Search coffee..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-[#f8f3e9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6F4E37] placeholder-gray-400"
+                        className="w-full pl-10 pr-4 py-2.5 bg-[#f8f3e9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6F4E37] placeholder-gray-400 transition-shadow duration-300"
                     />
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-hover:text-[#6F4E37] transition-colors" />
                   </div>
                 </div>
 
                 {/* Roast Level Filter */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3 text-[#2C1810]">Roast Level</h3>
+                <div className="space-y-3">
+                  <h3 className="text-lg font-semibold text-[#2C1810]">Roast Level</h3>
                   <div className="space-y-3">
                     {['Light', 'Medium', 'Dark'].map((level) => (
                         <label key={level} className="flex items-center space-x-3 cursor-pointer group">
@@ -185,7 +191,7 @@ export function Shop() {
                                 type="checkbox"
                                 checked={selectedRoastLevels.includes(level as RoastLevel)}
                                 onChange={() => toggleRoastLevel(level as RoastLevel)}
-                                className="w-5 h-5 rounded border-2 border-[#6F4E37] text-[#6F4E37] focus:ring-[#6F4E37] focus:ring-offset-0"
+                                className="w-5 h-5 rounded border-2 border-[#6F4E37] text-[#6F4E37] focus:ring-[#6F4E37] focus:ring-offset-0 transition-colors"
                             />
                           </div>
                           <span className="text-gray-700 group-hover:text-[#6F4E37] transition-colors">
@@ -197,8 +203,8 @@ export function Shop() {
                 </div>
 
                 {/* Price Range Filter */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-3 text-[#2C1810]">Price Range</h3>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#2C1810]">Price Range</h3>
                   <div className="space-y-4">
                     <input
                         type="range"
@@ -226,7 +232,7 @@ export function Shop() {
             {/* Product Grid */}
             <div className="flex-1">
               {/* Sort Dropdown */}
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-md animate-fade-in">
                 <p className="text-gray-600">
                   Showing {filteredAndSortedProducts.length} products
                 </p>
@@ -234,7 +240,7 @@ export function Shop() {
                   <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as SortOption)}
-                      className="appearance-none bg-white pl-4 pr-10 py-2.5 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6F4E37] text-gray-700 cursor-pointer"
+                      className="appearance-none bg-[#f8f3e9] pl-4 pr-10 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6F4E37] text-gray-700 cursor-pointer transition-colors hover:bg-[#f0e9dc]"
                   >
                     <option value="name-asc">Name (A-Z)</option>
                     <option value="name-desc">Name (Z-A)</option>
@@ -246,44 +252,54 @@ export function Shop() {
               </div>
 
               {filteredAndSortedProducts.length === 0 ? (
-                  <div className="text-center py-12 bg-white rounded-xl shadow-md">
+                  <div className="text-center py-12 bg-white rounded-xl shadow-md animate-fade-in">
                     <Coffee className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
                     <p className="text-gray-600">Try adjusting your filters or search terms</p>
                   </div>
               ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredAndSortedProducts.map((product) => (
-                        <div key={product.id} className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
+                    {filteredAndSortedProducts.map((product, index) => (
+                        <div
+                            key={product.id}
+                            className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-fade-in-up"
+                            style={{ animationDelay: `${index * 100}ms` }}
+                        >
                           <Link to={`/product/${product.id}`} className="block">
-                            <div className="aspect-square">
+                            <div className="aspect-square overflow-hidden">
                               <img
                                   src={product.mainImage}
                                   alt={product.name}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
                               />
                             </div>
-                            <div className="p-4">
-                              <h3 className="text-lg font-semibold mb-2 text-[#2C1810]">{product.name}</h3>
-                              <p className="text-[#6F4E37] font-bold">{product.price}</p>
-                              <div className="mt-2 flex flex-wrap gap-2">
-                                {product.flavorNotes.slice(0, 2).map((note, index) => (
+                            <div className="p-6">
+                              <h3 className="text-xl font-semibold mb-2 text-[#2C1810] group-hover:text-[#6F4E37] transition-colors">
+                                {product.name}
+                              </h3>
+                              <p className="text-[#6F4E37] font-bold text-lg">{product.price} Lei</p>
+                              <div className="mt-3 flex flex-wrap gap-2">
+                                {product.flavorNotes.map((note, index) => (
                                     <span
                                         key={index}
-                                        className="px-2 py-1 bg-[#f8f3e9] rounded-full text-xs text-[#6F4E37]"
+                                        className="px-3 py-1.5 bg-[#f8f3e9] rounded-full text-sm text-[#6F4E37] transform transition-transform duration-300 hover:scale-105"
                                     >
                               {note}
                             </span>
                                 ))}
                               </div>
+                              <div className="mt-4 text-sm text-gray-600">
+                                <span className="inline-block mr-4">{product.roastLevel} Roast</span>
+                                <span>{product.origin}</span>
+                              </div>
                             </div>
                           </Link>
-                          <div className="px-4 pb-4">
+                          <div className="px-6 pb-6">
                             <button
                                 onClick={() => addToCart(product)}
-                                className="w-full bg-[#6F4E37] text-white py-2 px-4 rounded-lg hover:bg-[#5D3D2B] transition-colors flex items-center justify-center gap-2"
+                                className="w-full bg-[#6F4E37] text-white py-3 px-4 rounded-lg hover:bg-[#5D3D2B] transition-colors flex items-center justify-center gap-2 group"
                             >
-                              <ShoppingCart className="w-4 h-4" />
+                              <ShoppingCart className="w-5 h-5 transform group-hover:scale-110 transition-transform" />
                               Add to Cart
                             </button>
                           </div>

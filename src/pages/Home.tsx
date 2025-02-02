@@ -47,26 +47,32 @@ export function Home() {
                 <div className="grid md:grid-cols-3 gap-12">
                     <div className="text-center transform hover:-translate-y-2 transition-transform duration-300 group">
                         <div className="relative inline-block">
-                            <div className="absolute inset-0 bg-[#6F4E37]/10 rounded-full scale-110 group-hover:scale-125 transition-transform duration-300" />
-                            <Coffee className="w-16 h-16 mx-auto mb-6 text-[#6F4E37] relative z-10 transform group-hover:rotate-12 transition-transform duration-300" />
+                            <div className="w-24 h-24 bg-[#6F4E37]/10 rounded-full scale-110 group-hover:scale-125 transition-transform duration-300" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Coffee className="w-12 h-12 text-[#6F4E37] transform group-hover:rotate-12 transition-transform duration-300" />
+                            </div>
                         </div>
-                        <h3 className="text-2xl font-semibold mb-3">Premium Beans</h3>
+                        <h3 className="text-2xl font-semibold mt-6 mb-3">Premium Beans</h3>
                         <p className="text-gray-600 leading-relaxed">Sourced from the finest coffee regions around the world</p>
                     </div>
                     <div className="text-center transform hover:-translate-y-2 transition-transform duration-300 group">
                         <div className="relative inline-block">
-                            <div className="absolute inset-0 bg-[#6F4E37]/10 rounded-full scale-110 group-hover:scale-125 transition-transform duration-300" />
-                            <Clock className="w-16 h-16 mx-auto mb-6 text-[#6F4E37] relative z-10 transform group-hover:rotate-12 transition-transform duration-300" />
+                            <div className="w-24 h-24 bg-[#6F4E37]/10 rounded-full scale-110 group-hover:scale-125 transition-transform duration-300" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Clock className="w-12 h-12 text-[#6F4E37] transform group-hover:rotate-12 transition-transform duration-300" />
+                            </div>
                         </div>
-                        <h3 className="text-2xl font-semibold mb-3">Fresh Daily</h3>
+                        <h3 className="text-2xl font-semibold mt-6 mb-3">Fresh Daily</h3>
                         <p className="text-gray-600 leading-relaxed">Roasted in small batches every morning</p>
                     </div>
                     <div className="text-center transform hover:-translate-y-2 transition-transform duration-300 group">
                         <div className="relative inline-block">
-                            <div className="absolute inset-0 bg-[#6F4E37]/10 rounded-full scale-110 group-hover:scale-125 transition-transform duration-300" />
-                            <MapPin className="w-16 h-16 mx-auto mb-6 text-[#6F4E37] relative z-10 transform group-hover:rotate-12 transition-transform duration-300" />
+                            <div className="w-24 h-24 bg-[#6F4E37]/10 rounded-full scale-110 group-hover:scale-125 transition-transform duration-300" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <MapPin className="w-12 h-12 text-[#6F4E37] transform group-hover:rotate-12 transition-transform duration-300" />
+                            </div>
                         </div>
-                        <h3 className="text-2xl font-semibold mb-3">Local Love</h3>
+                        <h3 className="text-2xl font-semibold mt-6 mb-3">Local Love</h3>
                         <p className="text-gray-600 leading-relaxed">Supporting local coffee farmers and communities</p>
                     </div>
                 </div>
@@ -105,7 +111,7 @@ export function Home() {
                                         <h3 className="text-2xl font-semibold mb-3 text-[#2C1810] group-hover:text-[#6F4E37] transition-colors">
                                             {product.name}
                                         </h3>
-                                        <p className="text-[#6F4E37] font-bold text-xl mb-4">{product.price}</p>
+                                        <p className="text-[#6F4E37] font-bold text-xl mb-4">{product.price} Lei</p>
                                         <div className="flex flex-wrap gap-2">
                                             {product.flavorNotes.map((note, index) => (
                                                 <span
